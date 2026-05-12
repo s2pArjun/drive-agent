@@ -29,13 +29,10 @@ trimmer = trim_messages(
 def state_modifier(state):
     messages = trimmer.invoke(state["messages"])
 
-    # Remove orphaned ToolMessages at the start
-    # (tool result with no preceding AI tool_call → Groq rejects this)
     while messages and isinstance(messages[0], ToolMessage):
         messages = messages[1:]
 
     # Remove trailing AIMessage that has tool_calls but no following ToolMessage
-    # (AI called a tool but result was trimmed away → also breaks Groq)
     while messages and isinstance(messages[-1], AIMessage) and messages[-1].tool_calls:
         messages = messages[:-1]
 
